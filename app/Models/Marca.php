@@ -10,4 +10,7 @@ class Marca extends Model
 {
     use SoftDeletes;
     use HasFactory;
+
+    protected $table = 'marcas';
+    protected $fillable = ['nome', 'imagem'];
 }
