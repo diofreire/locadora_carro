@@ -9,6 +9,18 @@ use Illuminate\Http\Response;
 
 class MarcaController extends Controller
 {
+
+    public $marca;
+
+    /**
+     *
+     * @param Marca $marca
+     */
+    public function __construct(Marca $marca)
+    {
+        $this->marca = $marca;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +28,7 @@ class MarcaController extends Controller
      */
     public function index()
     {
-        return Marca::all();
+        return $this->marca->all();
     }
 
     /**
@@ -27,40 +39,42 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
-        return Marca::create($request->all());
+        return $this->marca->create($request->all());
     }
 
     /**
      * Display the specified resource.
      *
-     * @param Marca $marca
+     * @param int $idMarca
      * @return Marca
      */
-    public function show(Marca $marca)
+    public function show(int $idMarca)
     {
-        return $marca;
+        return $this->marca->find($idMarca);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param Marca $marca
+     * @param int $idMarca
      * @return bool
      */
-    public function update(Request $request, Marca $marca)
+    public function update(Request $request, int $idMarca)
     {
+        $marca = $this->marca->find($idMarca);
         return $marca->update($request->all());
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Marca $marca
+     * @param int $idMarca
      * @return string[]
      */
-    public function destroy(Marca $marca)
+    public function destroy(int $idMarca)
     {
+        $marca = $this->marca->find($idMarca);
         $marca->delete();
         return ['msg' => 'A marca foi deletada'];
     }
