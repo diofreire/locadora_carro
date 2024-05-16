@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Marca;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -46,11 +47,13 @@ class MarcaController extends Controller
      * Display the specified resource.
      *
      * @param int $idMarca
-     * @return Marca
+     * @return JsonResponse
      */
     public function show(int $idMarca)
     {
-        return $this->marca->find($idMarca);
+        $dados = $this->marca->find($idMarca) ?? false;
+
+        return $dados ? $dados : response()->json(['error' => 'Não encontrado'], 404);
     }
 
     /**
@@ -58,24 +61,33 @@ class MarcaController extends Controller
      *
      * @param Request $request
      * @param int $idMarca
-     * @return bool
+     * @return JsonResponse|Marca
      */
     public function update(Request $request, int $idMarca)
     {
         $marca = $this->marca->find($idMarca);
-        return $marca->update($request->all());
+        if(!$marca) {
+            return response()->json(['error' => 'Não encontrado'], 404);
+        }
+
+        $marca->update($request->all());
+        return $marca;
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param int $idMarca
-     * @return string[]
+     * @return JsonResponse | array
      */
     public function destroy(int $idMarca)
     {
         $marca = $this->marca->find($idMarca);
-        $marca->delete();
-        return ['msg' => 'A marca foi deletada'];
+        if($marca) {
+            $marca->delete();
+            return ['msg' => 'A marca foi deletada'];
+        } else {
+            return response()->json(['error' => 'Não encontrado'], 404);
+        }
     }
 }
