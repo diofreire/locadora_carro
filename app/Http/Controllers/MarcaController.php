@@ -40,6 +40,9 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
+        // Validando parametros
+        $request->validate($this->marca->rules(), $this->marca->feedback());
+
         return $this->marca->create($request->all());
     }
 
@@ -66,10 +69,27 @@ class MarcaController extends Controller
     public function update(Request $request, int $idMarca)
     {
         $marca = $this->marca->find($idMarca);
+
         if(!$marca) {
             return response()->json(['error' => 'Não encontrado'], 404);
         }
 
+        // Validação do Methodo PATCH
+        if($request->method() === 'PATCH') {
+            $regras = [];
+
+            // percorre todas regras definidas
+            foreach ($marca->rules() as $input => $regra) {
+                // Coleta apenas as regras aplicaveis aos parametros enviados
+                if(array_key_exists($input, $request->all())) {
+                    $regras[$input] = $regra;
+                }
+            }
+        } else {
+            $regras = $this->marca->rules();
+        }
+
+        $request->validate($regras, $this->marca->feedback());
         $marca->update($request->all());
         return $marca;
     }
