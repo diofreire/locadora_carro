@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marca;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,7 +44,13 @@ class MarcaController extends Controller
         // Validando parametros
         $request->validate($this->marca->rules(), $this->marca->feedback());
 
-        return $this->marca->create($request->all());
+        // Trativa da imagens
+        $imagem = $request->file('imagem');
+
+        return $this->marca->create([
+            'nome' => $request->nome,
+            'imagem' => $imagem->store('imagens', 'public')
+        ]);
     }
 
     /**
@@ -90,7 +97,20 @@ class MarcaController extends Controller
         }
 
         $request->validate($regras, $this->marca->feedback());
-        $marca->update($request->all());
+
+        // Trativa da imagens
+        $imagem = $request->file('imagem');
+
+        // Removendo imagem atualizada
+        if($imagem) {
+            Storage::disk('public')->delete($marca->imagem);
+        }
+
+        $marca->update([
+            'nome' => $request->nome,
+            'imagem' => $imagem->store('imagens', 'public')
+        ]);
+
         return $marca;
     }
 
@@ -104,6 +124,9 @@ class MarcaController extends Controller
     {
         $marca = $this->marca->find($idMarca);
         if($marca) {
+            // Removendo arquivo da imagem
+            Storage::disk('public')->delete($marca->imagem);
+
             $marca->delete();
             return ['msg' => 'A marca foi deletada'];
         } else {
