@@ -27,8 +27,32 @@ class MarcaController extends Controller
      *
      * @return Collection|Marca[]
      */
-    public function index()
+    public function index(Request $request)
     {
+        $marcas = [];
+
+        // Verifica se há parametros na busca
+        if($request->has('modelos')) {
+            $marcas = $this->marca->with('modelos:id,'.$request->modelos);
+        } else {
+            $marcas = $this->marca->with('modelos');
+        }
+
+        // filtro
+        if($request->has('filtro')) {
+            $filtros = explode(',', $request->filtro);
+            foreach ($filtros as $key => $condicao) {
+                $c = explode(':', $condicao);
+                $marcas = $marcas->where($c[0], $c[1], $c[2]);
+            }
+        }
+
+        if($request->has('where')) {
+            $marcas = $marcas->selectRaw($request->where)->get();
+        } else {
+            $marcas = $marcas->get();
+        }
+
         return $this->marca->with('modelos')->all();
     }
 

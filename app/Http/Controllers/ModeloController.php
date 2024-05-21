@@ -27,9 +27,33 @@ class ModeloController extends Controller
      *
      * @return Collection|Modelo[]
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->modelo->with('marca')->get();
+        $modelos = [];
+
+        // Verifica se há parametros na busca
+        if($request->has('marca')) {
+            $modelos = $this->modelo->with('marca:id,'.$request->marca);
+        } else {
+            $modelos = $this->modelo->with('marca');
+        }
+
+        // filtro
+        if($request->has('filtro')) {
+            $filtros = explode(',', $request->filtro);
+            foreach ($filtros as $key => $condicao) {
+                $c = explode(':', $condicao);
+                $modelos = $modelos->where($c[0], $c[1], $c[2]);
+            }
+        }
+
+        if($request->has('where')) {
+            $modelos = $modelos->selectRaw($request->where)->get();
+        } else {
+            $modelos = $modelos->get();
+        }
+
+        return $modelos;
     }
 
     /**
