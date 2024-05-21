@@ -111,7 +111,12 @@ class ModeloController extends Controller
             Storage::disk('public')->delete($modelo->imagem);
         }
 
-        $modelo->update([
+        //preenche o objeto $marca com os dados do request
+        $modelo->fill($request->all());
+        $modelo->imagem = $imagem->store('imagens/modelos', 'public');
+        $modelo->save();
+
+        /*$modelo->update([
             'marca_id' => $request->marca_id,
             'nome' => $request->nome,
             'imagem' => $imagem->store('imagens/modelos', 'public'),
@@ -119,7 +124,7 @@ class ModeloController extends Controller
             'lugares' => $request->lugares,
             'air_bag' => $request->air_bag,
             'abs' => $request->abs
-        ]);
+        ]);*/
 
         return $modelo;
     }
