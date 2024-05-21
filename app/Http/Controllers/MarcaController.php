@@ -53,7 +53,7 @@ class MarcaController extends Controller
             $marcas = $marcas->get();
         }
 
-        return $this->marca->with('modelos')->all();
+        return $marcas;
     }
 
     /**
