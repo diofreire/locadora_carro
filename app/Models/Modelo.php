@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Modelo extends Model
@@ -46,5 +47,13 @@ class Modelo extends Model
             'lugares.digits_between' => 'O campo :attribute precisa ser entre 1 e 20',
             'boolean' => 'Valor inválido'
         ];
+    }
+
+    /**
+     * Um MODELO percente a UMA MARCA
+     * @return BelongsTo
+     */
+    public function marca() {
+        return $this->belongsTo('App\Models\Marca');
     }
 }

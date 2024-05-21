@@ -29,7 +29,7 @@ class ModeloController extends Controller
      */
     public function index()
     {
-        return $this->modelo->all();
+        return $this->modelo->with('marca')->get();
     }
 
     /**
@@ -65,7 +65,7 @@ class ModeloController extends Controller
      */
     public function show(int $idModelo)
     {
-        $dados = $this->modelo->find($idModelo) ?? false;
+        $dados = $this->modelo->with('marca')->find($idModelo) ?? false;
 
         return $dados ? $dados : response()->json(['error' => 'Não encontrado'], 404);
     }
