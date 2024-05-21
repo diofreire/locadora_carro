@@ -3,83 +3,144 @@
 namespace App\Http\Controllers;
 
 use App\Models\Modelo;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ModeloController extends Controller
 {
+    public $modelo;
+
     /**
-     * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Modelo $modelo
      */
-    public function index()
+    public function __construct(Modelo $modelo)
     {
-        //
+        $this->modelo = $modelo;
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Collection|Modelo[]
      */
-    public function create()
+    public function index()
     {
-        //
+        return $this->modelo->all();
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(Request $request)
     {
-        //
+        // Validando parametros
+        $request->validate($this->modelo->rules(), $this->modelo->feedback());
+
+        // Trativa da imagens
+        $imagem = $request->file('imagem');
+
+        return $this->modelo->create([
+            'marca_id' => $request->marca_id,
+            'nome' => $request->nome,
+            'imagem' => $imagem->store('imagens/modelos', 'public'),
+            'numero_portas' => $request->numero_portas,
+            'lugares' => $request->lugares,
+            'air_bag' => $request->air_bag,
+            'abs' => $request->abs
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Modelo  $modelo
-     * @return \Illuminate\Http\Response
+     * @param int $idModelo
+     * @return JsonResponse
      */
-    public function show(Modelo $modelo)
+    public function show(int $idModelo)
     {
-        //
+        $dados = $this->modelo->find($idModelo) ?? false;
+
+        return $dados ? $dados : response()->json(['error' => 'Não encontrado'], 404);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Modelo  $modelo
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Modelo $modelo)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Modelo  $modelo
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $idModelo
+     * @return JsonResponse
      */
-    public function update(Request $request, Modelo $modelo)
+    public function update(Request $request, int $idModelo)
     {
-        //
+        $modelo = $this->modelo->find($idModelo);
+
+        if(!$modelo) {
+            return response()->json(['error' => 'Não encontrado'], 404);
+        }
+
+        // Validação do Methodo PATCH
+        if($request->method() === 'PATCH') {
+            $regras = [];
+
+            // percorre todas regras definidas
+            foreach ($modelo->rules() as $input => $regra) {
+                // Coleta apenas as regras aplicaveis aos parametros enviados
+                if(array_key_exists($input, $request->all())) {
+                    $regras[$input] = $regra;
+                }
+            }
+        } else {
+            $regras = $this->modelo->rules();
+        }
+
+        $request->validate($regras, $this->modelo->feedback());
+
+        // Trativa da imagens
+        $imagem = $request->file('imagem');
+
+        // Removendo imagem atualizada
+        if($imagem) {
+            Storage::disk('public')->delete($modelo->imagem);
+        }
+
+        $modelo->update([
+            'marca_id' => $request->marca_id,
+            'nome' => $request->nome,
+            'imagem' => $imagem->store('imagens/modelos', 'public'),
+            'numero_portas' => $request->numero_portas,
+            'lugares' => $request->lugares,
+            'air_bag' => $request->air_bag,
+            'abs' => $request->abs
+        ]);
+
+        return $modelo;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Modelo  $modelo
-     * @return \Illuminate\Http\Response
+     * @param int $idModelo
+     * @return JsonResponse|string[]
      */
-    public function destroy(Modelo $modelo)
+    public function destroy(int $idModelo)
     {
-        //
+        $modelo = $this->modelo->find($idModelo);
+        if($modelo) {
+            // Removendo arquivo da imagem
+            Storage::disk('public')->delete($modelo->imagem);
+
+            $modelo->delete();
+            return ['msg' => 'A marca foi deletada'];
+        } else {
+            return response()->json(['error' => 'Não encontrado'], 404);
+        }
     }
 }
