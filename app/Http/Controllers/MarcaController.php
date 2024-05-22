@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marca;
+use App\Repository\MarcaRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,35 +26,29 @@ class MarcaController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Collection|Marca[]
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $marcas = [];
+        // Repository
+        $marcaRepository = new MarcaRepository($this->marca);
 
-        // Verifica se há parametros na busca
         if($request->has('modelos')) {
-            $marcas = $this->marca->with('modelos:id,'.$request->modelos);
+            $marcaRepository->selectWithAtributtes('modelos:id,'.$request->modelos);
         } else {
-            $marcas = $this->marca->with('modelos');
+            $marcaRepository->selectWithAtributtes('modelos');
         }
 
-        // filtro
         if($request->has('filtro')) {
-            $filtros = explode(',', $request->filtro);
-            foreach ($filtros as $key => $condicao) {
-                $c = explode(':', $condicao);
-                $marcas = $marcas->where($c[0], $c[1], $c[2]);
-            }
+            $marcaRepository->filtro($request->filtro);
         }
 
         if($request->has('where')) {
-            $marcas = $marcas->selectRaw($request->where)->get();
-        } else {
-            $marcas = $marcas->get();
+            $marcaRepository->selectRaw($request->where);
         }
 
-        return $marcas;
+        return response()->json($marcaRepository->getResultado(), 200);
     }
 
     /**

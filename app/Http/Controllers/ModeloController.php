@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Modelo;
+use App\Repository\ModeloRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,35 +26,29 @@ class ModeloController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Collection|Modelo[]
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $modelos = [];
+        // Repository
+        $modeloRepository = new ModeloRepository($this->modelo);
 
-        // Verifica se há parametros na busca
         if($request->has('marca')) {
-            $modelos = $this->modelo->with('marca:id,'.$request->marca);
+            $modeloRepository->selectWithAtributtes('marca:id,'.$request->marca);
         } else {
-            $modelos = $this->modelo->with('marca');
+            $modeloRepository->selectWithAtributtes('marca');
         }
 
-        // filtro
         if($request->has('filtro')) {
-            $filtros = explode(',', $request->filtro);
-            foreach ($filtros as $key => $condicao) {
-                $c = explode(':', $condicao);
-                $modelos = $modelos->where($c[0], $c[1], $c[2]);
-            }
+            $modeloRepository->filtro($request->filtro);
         }
 
         if($request->has('where')) {
-            $modelos = $modelos->selectRaw($request->where)->get();
-        } else {
-            $modelos = $modelos->get();
+            $modeloRepository->selectRaw($request->where);
         }
 
-        return $modelos;
+        return response()->json($modeloRepository->getResultado(), 200);
     }
 
     /**
