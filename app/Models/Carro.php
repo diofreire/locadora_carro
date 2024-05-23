@@ -36,7 +36,6 @@ class Carro extends Model
         return [
             'required' => 'O campo :attribute precisa ser preenchido',
             'modelo_id.exists' => 'O modelo informado não não existe',
-
         ];
     }
 
