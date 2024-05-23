@@ -39,6 +39,7 @@ class Modelo extends Model
     {
         return [
             'required' => 'O campo :attribute precisa ser preenchido',
+            'marca_id.exists' => 'A marca informada não não existe',
             'nome.unique' => 'O nome do modelo já existe',
             'nome.min' => 'O campo :attribute precisa ter no mínimo 3 caracteres',
             'imagem.mimes' => 'O arquivo deve ser uma imagem do tipo PNG ou JPEG',
