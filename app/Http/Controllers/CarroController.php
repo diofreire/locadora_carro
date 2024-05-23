@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carro;
-use App\Repository\CarroRepository;
+use App\Repository\ClienteRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,6 @@ class CarroController extends Controller
         $this->carro = $carro;
     }
 
-
     /**
      * Display a listing of the resource.
      *
@@ -26,7 +25,7 @@ class CarroController extends Controller
      */
     public function index(Request $request)
     {
-        $carroRepository = new CarroRepository($this->carro);
+        $carroRepository = new ClienteRepository($this->carro);
 
         if($request->has('modelo')) {
             $carroRepository->selectWithAtributtes('modelo:id,'.$request->modelo);

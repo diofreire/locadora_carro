@@ -10,6 +10,8 @@ class Carro extends Model
 {
     use SoftDeletes;
     use HasFactory;
+
+    protected $table = 'carros';
     protected $fillable = ['modelo_id', 'placa', 'disponivel', 'km'];
 
     /**
