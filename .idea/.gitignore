@@ -7,3 +7,5 @@
 /dataSources/
 /dataSources.local.xml
 /symfony2.xml
+/codeception.xml
+/phpspec.xml
