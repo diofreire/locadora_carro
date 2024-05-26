@@ -23,6 +23,38 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
+    /**
+     * Get the authenticated User.
+     *
+     * @return JsonResponse
+     */
+    public function me()
+    {
+        return response()->json(auth()->user());
+    }
+
+    /**
+     * Refresh a token.
+     *
+     * @return JsonResponse
+     */
+    public function refresh()
+    {
+        // cliente encaminha um jwt valido
+        return $this->respondWithToken(auth('api')->refresh());
+    }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return JsonResponse
+     */
+    public function logout()
+    {
+        auth('api')->logout();
+
+        return response()->json(['message' => 'Logoff realizado com sucesso']);
+    }
 
     /**
      * Get the token array structure.
