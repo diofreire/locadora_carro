@@ -7,14 +7,14 @@
                     <template v-slot:conteudo>
                         <div class="form-row">
                             <div class="col mb-3">
-                                <input-container titulo="ID" id="inputId" id-help="idHelp" texto-ajuda="Opcional. Informe o ID do registro">
+                                <inputContainer-component titulo="ID" id="inputId" id-help="idHelp" texto-ajuda="Opcional. Informe o ID do registro">
                                     <input type="number" class="form-control" id="inputId" aria-describedby="idHelp" placeholder="ID">
-                                </input-container>
+                                </inputContainer-component>
                             </div>
                             <div class="col mb-3">
-                                <input-container titulo="Nome da Marca" id="nomeHelp" id-help="nomeHelp" texto-ajuda="Opcional. Informe o Nome da marca">
+                                <inputContainer-component titulo="Nome da Marca" id="nomeHelp" id-help="nomeHelp" texto-ajuda="Opcional. Informe o Nome da marca">
                                     <input type="text" class="form-control" id="inputNome" aria-describedby="nomeHelp" placeholder="Nome da Marca">
-                                </input-container>
+                                </inputContainer-component>
                             </div>
                         </div>
                     </template>
@@ -41,21 +41,21 @@
             <template v-slot:conteudo>
                 <div class="form-group">
                     <div class="col mb-3">
-                        <input-container titulo="Nome da Marca" id="novoNome" id-help="novoNomeHelp" texto-ajuda="Informe o nome da Marca">
-                            <input type="text" class="form-control" id="novoNome" aria-describedby="novoNomeHelp" placeholder="Nome da Marca">
-                        </input-container>
+                        <inputContainer-component titulo="Nome da Marca" id="novoNome" id-help="novoNomeHelp" texto-ajuda="Informe o nome da Marca">
+                            <input type="text" class="form-control" id="novoNome" aria-describedby="novoNomeHelp" placeholder="Nome da Marca" v-model="nomeMarca">
+                        </inputContainer-component>
                     </div>
 
                     <div class="col mb-3">
-                        <input-container titulo="Imagem" id="novoImagem" id-help="novoImagemHelp" texto-ajuda="Selecione uma imagem no formato PNG">
-                            <input type="file" class="form-control-file" id="novoImagem" aria-describedby="novoImagemHelp" placeholder="Selecione uma imagem">
-                        </input-container>
+                        <inputContainer-component titulo="Imagem" id="novoImagem" id-help="novoImagemHelp" texto-ajuda="Selecione uma imagem no formato PNG">
+                            <input type="file" class="form-control-file" id="novoImagem" aria-describedby="novoImagemHelp" placeholder="Selecione uma imagem" @change="carregarImagem($event)">
+                        </inputContainer-component>
                     </div>
                 </div>
             </template>
             <template v-slot:bottons>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">Salvar</button>
+                <button type="button" class="btn btn-primary" @click="salvar()">Salvar</button>
             </template>
 
         </modal-component>
@@ -64,11 +64,51 @@
 </template>
 
 <script>
+    export default {
+        computed: {
+            token() {
+                let token = document.cookie.split('; ')
+                    .find(row => row.startsWith('token='))
+                    .split('=')[1]
 
-import {defineComponent} from "vue";
-import InputContainer from "./InputContainer.vue";
+                return 'bearer ' + token;
+            }
+        },
+        data() {
+            return {
+                urlBase: 'http://localhost:8000/api/v1/marca',
+                nomeMarca: '',
+                arquivoImagem: [],
 
-export default defineComponent({
-    components: {InputContainer}
-})
+            }
+        },
+        methods: {
+            carregarImagem(e) {
+                this.arquivoImagem = e.target.files
+            },
+            salvar() {
+                //console.log(this.nomeMarca, this.arquivoImagem)
+
+                let formData = new FormData();
+                formData.append('nome', this.nomeMarca);
+                formData.append('imagem', this.arquivoImagem[0]);
+
+                let config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                axios.post(this.urlBase, formData, config)
+                    .then(response => {
+                        console.log(response)
+                    })
+                    .catch(erros => {
+                        console.log(erros)
+                    })
+            }
+        }
+    }
 </script>

@@ -2287,8 +2287,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
-/* harmony import */ var _InputContainer_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InputContainer.vue */ "./resources/js/components/InputContainer.vue");
 //
 //
 //
@@ -2355,13 +2353,47 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  computed: {
+    token: function token() {
+      var token = document.cookie.split('; ').find(function (row) {
+        return row.startsWith('token=');
+      }).split('=')[1];
+      return 'bearer ' + token;
+    }
+  },
+  data: function data() {
+    return {
+      urlBase: 'http://localhost:8000/api/v1/marca',
+      nomeMarca: '',
+      arquivoImagem: []
+    };
+  },
+  methods: {
+    carregarImagem: function carregarImagem(e) {
+      this.arquivoImagem = e.target.files;
+    },
+    salvar: function salvar() {
+      //console.log(this.nomeMarca, this.arquivoImagem)
 
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,vue__WEBPACK_IMPORTED_MODULE_1__.defineComponent)({
-  components: {
-    InputContainer: _InputContainer_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+      var formData = new FormData();
+      formData.append('nome', this.nomeMarca);
+      formData.append('imagem', this.arquivoImagem[0]);
+      var config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json',
+          'Authorization': this.token
+        }
+      };
+      axios.post(this.urlBase, formData, config).then(function (response) {
+        console.log(response);
+      })["catch"](function (erros) {
+        console.log(erros);
+      });
+    }
   }
-}));
+});
 
 /***/ }),
 
@@ -2474,7 +2506,7 @@ Vue.component('example-component', (__webpack_require__(/*! ./components/Example
 Vue.component('login-component', (__webpack_require__(/*! ./components/Login.vue */ "./resources/js/components/Login.vue")["default"]));
 Vue.component('home-component', (__webpack_require__(/*! ./components/Home.vue */ "./resources/js/components/Home.vue")["default"]));
 Vue.component('marcas-component', (__webpack_require__(/*! ./components/Marcas.vue */ "./resources/js/components/Marcas.vue")["default"]));
-Vue.component('input-container-component', (__webpack_require__(/*! ./components/InputContainer.vue */ "./resources/js/components/InputContainer.vue")["default"]));
+Vue.component('inputContainer-component', (__webpack_require__(/*! ./components/InputContainer.vue */ "./resources/js/components/InputContainer.vue")["default"]));
 Vue.component('table-component', (__webpack_require__(/*! ./components/Table.vue */ "./resources/js/components/Table.vue")["default"]));
 Vue.component('card-component', (__webpack_require__(/*! ./components/Card.vue */ "./resources/js/components/Card.vue")["default"]));
 Vue.component('modal-component', (__webpack_require__(/*! ./components/Modal.vue */ "./resources/js/components/Modal.vue")["default"]));
@@ -38659,7 +38691,7 @@ var render = function () {
                           { staticClass: "col mb-3" },
                           [
                             _c(
-                              "input-container",
+                              "inputContainer-component",
                               {
                                 attrs: {
                                   titulo: "ID",
@@ -38690,7 +38722,7 @@ var render = function () {
                           { staticClass: "col mb-3" },
                           [
                             _c(
-                              "input-container",
+                              "inputContainer-component",
                               {
                                 attrs: {
                                   titulo: "Nome da Marca",
@@ -38789,7 +38821,7 @@ var render = function () {
                     { staticClass: "col mb-3" },
                     [
                       _c(
-                        "input-container",
+                        "inputContainer-component",
                         {
                           attrs: {
                             titulo: "Nome da Marca",
@@ -38800,12 +38832,29 @@ var render = function () {
                         },
                         [
                           _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.nomeMarca,
+                                expression: "nomeMarca",
+                              },
+                            ],
                             staticClass: "form-control",
                             attrs: {
                               type: "text",
                               id: "novoNome",
                               "aria-describedby": "novoNomeHelp",
                               placeholder: "Nome da Marca",
+                            },
+                            domProps: { value: _vm.nomeMarca },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.nomeMarca = $event.target.value
+                              },
                             },
                           }),
                         ]
@@ -38819,7 +38868,7 @@ var render = function () {
                     { staticClass: "col mb-3" },
                     [
                       _c(
-                        "input-container",
+                        "inputContainer-component",
                         {
                           attrs: {
                             titulo: "Imagem",
@@ -38837,6 +38886,11 @@ var render = function () {
                               id: "novoImagem",
                               "aria-describedby": "novoImagemHelp",
                               placeholder: "Selecione uma imagem",
+                            },
+                            on: {
+                              change: function ($event) {
+                                return _vm.carregarImagem($event)
+                              },
                             },
                           }),
                         ]
@@ -38864,7 +38918,15 @@ var render = function () {
                 _vm._v(" "),
                 _c(
                   "button",
-                  { staticClass: "btn btn-primary", attrs: { type: "button" } },
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function ($event) {
+                        return _vm.salvar()
+                      },
+                    },
+                  },
                   [_vm._v("Salvar")]
                 ),
               ]
