@@ -84,7 +84,9 @@
                 nomeMarca: '',
                 arquivoImagem: [],
                 transacaoStatus: '',
-                returnMessage: []
+                returnMessage: {
+
+                }
             }
         },
         methods: {
@@ -110,12 +112,17 @@
                 axios.post(this.urlBase, formData, config)
                     .then(response => {
                         this.transacaoStatus = 'adicionado'
-                        this.returnMessage = response
+                        this.returnMessage = {
+                            mensagem: 'ID do Registro' + idresponse.data.id
+                        }
                         //console.log(response)
                     })
                     .catch(erros => {
                         this.transacaoStatus = 'erro'
-                        this.returnMessage = erros.response
+                        this.returnMessage = {
+                            mensagem: erros.response.data.message,
+                            erros: erros.response.data.errors
+                        }
                         //console.log(erros.response.data)
                     })
             }

@@ -2,13 +2,10 @@
     <div :class="estilo" role="alert">
         {{ titulo }}
         <hr>
-        <!-- Só imprime de existe -->
-        <span v-if="detalhes.data.message">{{ detalhes.data.message }}</span>
-        <span v-if="detalhes.data.id">{{ "ID do Registro" + detalhes.data.id }}</span>
-        <br>
+        <p>{{ detalhes.mensagem }}</p>
         <!-- Detalhes do erro -->
-        <ul v-if="detalhes.data.errors">
-            <li v-for="e, key in detalhes.data.errors" :key="key"> {{ e[0] }}</li>
+        <ul v-if="detalhes.erros">
+            <li v-for="e, key in detalhes.erros" :key="key"> {{ e[0] }}</li>
         </ul>
     </div>
 </template>
