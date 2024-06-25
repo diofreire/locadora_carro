@@ -36,6 +36,7 @@ class Marca extends Model
             'required' => 'O campo :attribute precisa ser preenchido',
             'nome.unique' => 'O nome da marca já existe',
             'nome.min' => 'O campo :attribute precisa ter no mínimo 3 caracteres',
+            'imagem.file' => 'O arquivo deve ser uma imagem do tipo PNG ou JPEG',
             'imagem.mimes' => 'O arquivo deve ser uma imagem do tipo PNG ou JPEG'
         ];
     }
