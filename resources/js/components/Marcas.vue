@@ -84,12 +84,28 @@
                 nomeMarca: '',
                 arquivoImagem: [],
                 transacaoStatus: '',
-                returnMessage: {
-
-                }
+                returnMessage: {},
+                marcas: []
             }
         },
         methods: {
+            carregarLista() {
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                axios.get(this.urlBase, config)
+                    .then(response => {
+                        this.marcas = response.data
+                        console.log(response.data)
+                    })
+                    .catch(erros => {
+                        console.log(erros)
+                    })
+            },
             carregarImagem(e) {
                 this.arquivoImagem = e.target.files
             },
@@ -126,6 +142,9 @@
                         //console.log(erros.response.data)
                     })
             }
+        },
+        mounted() {
+            this.carregarLista()
         }
     }
 </script>
