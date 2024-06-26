@@ -26,7 +26,11 @@
                 <!-- Início do card de listagem de marcas -->
                 <card-component titulo="Relação de marcas">
                     <template v-slot:conteudo>
-                        <table-component></table-component>
+                        <table-component
+                            :dados="marcas"
+                            :titulos="['ID', 'Nome', 'Imagem']">
+
+                        </table-component>
                     </template>
                     <template v-slot:rodape>
                         <button type="submit" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#modalMarca">Adicionar</button>
@@ -100,7 +104,7 @@
                 axios.get(this.urlBase, config)
                     .then(response => {
                         this.marcas = response.data
-                        console.log(response.data)
+                        //console.log(response.data)
                     })
                     .catch(erros => {
                         console.log(erros)
