@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-10">
                 <!-- Inicío do card de busca -->
                 <card-component titulo="Busca de Marcas">
                     <template v-slot:conteudo>
@@ -28,7 +28,13 @@
                     <template v-slot:conteudo>
                         <table-component
                             :dados="marcas"
-                            :titulos="['id', 'nome', 'imagem']">
+                            :titulos="{
+                                id: { titulo: 'ID', tipo: 'texto' },
+                                nome: { titulo: 'Nome', tipo: 'texto' },
+                                imagem: { titulo: 'Imagem', tipo: 'imagem' },
+                                created_at: { titulo: 'Data criação', tipo: 'data' },
+                            }"
+                        >
 
                         </table-component>
                     </template>
