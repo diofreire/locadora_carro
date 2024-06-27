@@ -49,4 +49,11 @@ abstract class AbstractRepository
     public function getResultado() {
         return $this->model->get();
     }
+
+    /**
+     * @return mixed
+     */
+    public function getResultadoPaginado($numeroPagina) {
+        return $this->model->paginate($numeroPagina);
+    }
 }

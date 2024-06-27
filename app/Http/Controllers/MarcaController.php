@@ -48,7 +48,7 @@ class MarcaController extends Controller
             $marcaRepository->selectRaw($request->where);
         }
 
-        return response()->json($marcaRepository->getResultado(), 200);
+        return response()->json($marcaRepository->getResultadoPaginado(3), 200);
     }
 
     /**
