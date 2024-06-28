@@ -20,24 +20,11 @@
                            {{ valor }}
                         </span>
                     </td>
-                    <td v-if="visualizar || atualizar || remover">
-<!--                        <td>-->
-<!--                            <a href="{{ route('tarefa.edit', ['tarefa' => $t['id']]) }}" data-bs-toggle="tooltip" title="Editar" >-->
-<!--                                <i class="bi-pencil-fill"></i>-->
-<!--                            </a>-->
-<!--                            <td>-->
-<!--                                <form id='form_{{$t['id']}}' action="{{ route('tarefa.destroy', ['tarefa' => $t['id']]) }}" method="post">-->
-<!--                                @csrf-->
-<!--                                @method('DELETE')-->
-<!--                                <a href="#" onclick="document.getElementById('form_{{$t['id']}}').submit()" data-bs-toggle="tooltip" title="Excluir">-->
-<!--                                    <i class="bi-trash-fill"></i>-->
-<!--                                </a>-->
-<!--                                </form>-->
-<!--                            </td>-->
-
-                        <button v-if="visualizar" class="bi bi-info-square btn-outline-primary btn-sm"
-                                data-toggle="modal"
-                                data-target="#modalMarcaVisualizar">
+                    <td v-if="visualizar.visivel || atualizar || remover">
+                        <button v-if="visualizar.visivel" class="bi bi-info-square btn-outline-primary btn-sm"
+                                :data-toggle="visualizar.dataToggle"
+                                :data-target="visualizar.dataTarget"
+                                @click="setStore(obj)">
                             Visualizar
                         </button>
                         <button v-if="atualizar" class="bi bi-pencil-fill btn-outline-primary btn-sm"> Atualizar</button>
@@ -52,6 +39,12 @@
 <script>
     export default {
         props: ['dados', 'titulos', 'atualizar', 'visualizar', 'remover'],
+        methods: {
+            setStore(obj) {
+                this.$store.state.item = obj
+                //console.log(obj)
+            }
+        },
         computed: {
             dadosFiltrados() {
 
