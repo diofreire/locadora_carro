@@ -4,6 +4,7 @@
             <thead>
                 <tr >
                     <th v-for="t, key in titulos" :key="key" scope="col">{{ t.titulo }}</th>
+                    <th v-if="visualizar || atualizar || remover"></th>
                 </tr>
             </thead>
             <tbody>
@@ -19,17 +20,30 @@
                            {{ valor }}
                         </span>
                     </td>
+                    <td v-if="visualizar || atualizar || remover">
+<!--                        <td>-->
+<!--                            <a href="{{ route('tarefa.edit', ['tarefa' => $t['id']]) }}" data-bs-toggle="tooltip" title="Editar" >-->
+<!--                                <i class="bi-pencil-fill"></i>-->
+<!--                            </a>-->
+<!--                            <td>-->
+<!--                                <form id='form_{{$t['id']}}' action="{{ route('tarefa.destroy', ['tarefa' => $t['id']]) }}" method="post">-->
+<!--                                @csrf-->
+<!--                                @method('DELETE')-->
+<!--                                <a href="#" onclick="document.getElementById('form_{{$t['id']}}').submit()" data-bs-toggle="tooltip" title="Excluir">-->
+<!--                                    <i class="bi-trash-fill"></i>-->
+<!--                                </a>-->
+<!--                                </form>-->
+<!--                            </td>-->
+
+                        <button v-if="visualizar" class="bi bi-info-square btn-outline-primary btn-sm"
+                                data-toggle="modal"
+                                data-target="#modalMarcaVisualizar">
+                            Visualizar
+                        </button>
+                        <button v-if="atualizar" class="bi bi-pencil-fill btn-outline-primary btn-sm"> Atualizar</button>
+                        <button v-if="remover" class="bi-trash btn-outline-danger btn-sm"> Remover</button>
+                    </td>
                 </tr>
-<!--                <tr v-for="obj in dados" :key="obj.id">-->
-<!--                    <td v-if="titulos.includes(chave)" v-for="valor, chave in obj" :key="chave">-->
-<!--                        <span v-if="chave === 'imagem'">-->
-<!--                            <img :src="'/storage/'+valor" width="30" height="30">-->
-<!--                        </span>-->
-<!--                        <span v-else>-->
-<!--                           {{ valor }}-->
-<!--                        </span>-->
-<!--                    </td>-->
-<!--                </tr>-->
             </tbody>
         </table>
     </div>
@@ -37,7 +51,7 @@
 
 <script>
     export default {
-        props: ['dados', 'titulos'],
+        props: ['dados', 'titulos', 'atualizar', 'visualizar', 'remover'],
         computed: {
             dadosFiltrados() {
 

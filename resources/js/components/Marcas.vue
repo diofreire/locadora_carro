@@ -8,18 +8,18 @@
                         <div class="form-row">
                             <div class="col mb-3">
                                 <inputContainer-component titulo="ID" id="inputId" id-help="idHelp" texto-ajuda="Opcional. Informe o ID do registro">
-                                    <input type="number" class="form-control" id="inputId" aria-describedby="idHelp" placeholder="ID">
+                                    <input type="number" class="form-control" id="inputId" aria-describedby="idHelp" placeholder="ID" v-model="busca.id">
                                 </inputContainer-component>
                             </div>
                             <div class="col mb-3">
                                 <inputContainer-component titulo="Nome da Marca" id="nomeHelp" id-help="nomeHelp" texto-ajuda="Opcional. Informe o Nome da marca">
-                                    <input type="text" class="form-control" id="inputNome" aria-describedby="nomeHelp" placeholder="Nome da Marca">
+                                    <input type="text" class="form-control" id="inputNome" aria-describedby="nomeHelp" placeholder="Nome da Marca" v-model="busca.nome">
                                 </inputContainer-component>
                             </div>
                         </div>
                     </template>
                     <template v-slot:rodape>
-                        <button type="submit" class="btn btn-primary btn-sm float-right">Pesquisar</button>
+                        <button type="submit" class="btn btn-primary btn-sm float-right" @click="pequisar()">Pesquisar</button>
                     </template>
                 </card-component>
                 <!-- Fim do card de busca -->
@@ -28,6 +28,9 @@
                     <template v-slot:conteudo>
                         <table-component
                             :dados="marcas.data"
+                            :visualizar="true"
+                            :atualizar="true"
+                            :remover="true"
                             :titulos="{
                                 id: { titulo: 'ID', tipo: 'texto' },
                                 nome: { titulo: 'Nome', tipo: 'texto' },
@@ -61,6 +64,7 @@
             </div>
         </div>
 
+        <!-- Início do Modal de criação de Marca -->
         <modal-component id="modalMarca" titulo="Adicionar Marca">
             <template v-slot:alertas>
                 <alert-component tipo="success" :detalhes="returnMessage" titulo="Cadastro realizado com Sucesso" v-if="transacaoStatus == 'adicionado'"></alert-component>
@@ -85,8 +89,21 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" @click="salvar()">Salvar</button>
             </template>
-
         </modal-component>
+
+        <!-- Início do Modal de Visualizaçao de Marca -->
+        <modal-component id="modalMarcaVisualizar" titulo="Visualizar Marca">
+            <template v-slot:alertas>
+            </template>
+            <template v-slot:conteudo>
+                Teste
+            </template>
+            <template v-slot:bottons>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            </template>
+        </modal-component>
+
+
     </div>
 
 </template>
@@ -105,17 +122,23 @@
         data() {
             return {
                 urlBase: 'http://localhost:8000/api/v1/marca',
+                urlPaginacao: '',
+                urlFiltro: '',
                 nomeMarca: '',
                 arquivoImagem: [],
                 transacaoStatus: '',
                 returnMessage: {},
-                marcas: {
-                    data: []
+                marcas: { data: [] },
+                busca: {
+                    nome: '',
+                    id: ''
                 }
             }
         },
         methods: {
             carregarLista() {
+                let url = this.urlBase + '?' + this.urlPaginacao + this.urlFiltro
+
                 let config = {
                     headers: {
                         'Accept': 'application/json',
@@ -123,7 +146,7 @@
                     }
                 }
 
-                axios.get(this.urlBase, config)
+                axios.get(url, config)
                     .then(response => {
                         this.marcas = response.data
                         //console.log(this.marcas)
@@ -170,9 +193,32 @@
             },
             paginacao(l) {
                 if(l.url) {
-                    this.urlBase = l.url //ajustando a url de consulta com parametro de página
+                    //this.urlBase = l.url //ajustando a url de consulta com parametro de página
+                    this.urlPaginacao = l.url.split('?')[1];
                     this.carregarLista() //atualizando
                 }
+            },
+            pequisar() {
+                let filtro = ''
+                for(let chave in this.busca) {
+                    if(this.busca[chave]) {
+                        //console.log(chave, this.busca[chave])
+                        if(filtro != '') {
+                            filtro += ";"
+                        }
+                        filtro += chave + ':like:' + this.busca[chave]
+                    }
+                }
+
+                //console.log(filtro)
+                if(filtro != '') {
+                    this.urlPaginacao = 'page=1'
+                    this.urlFiltro = '&filtro='+filtro
+                } else {
+                    this.urlFiltro = ''
+                }
+
+                this.carregarLista()
             }
         },
         mounted() {
