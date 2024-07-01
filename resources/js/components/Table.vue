@@ -4,7 +4,7 @@
             <thead>
                 <tr >
                     <th v-for="t, key in titulos" :key="key" scope="col">{{ t.titulo }}</th>
-                    <th v-if="visualizar || atualizar || remover"></th>
+                    <th v-if="visualizar.visivel || atualizar || remover.visivel"></th>
                 </tr>
             </thead>
             <tbody>
@@ -20,7 +20,7 @@
                            {{ valor }}
                         </span>
                     </td>
-                    <td v-if="visualizar.visivel || atualizar || remover">
+                    <td v-if="visualizar.visivel || atualizar || remover.visivel">
                         <button v-if="visualizar.visivel" class="bi bi-info-square btn-outline-primary btn-sm"
                                 :data-toggle="visualizar.dataToggle"
                                 :data-target="visualizar.dataTarget"
@@ -28,7 +28,12 @@
                             Visualizar
                         </button>
                         <button v-if="atualizar" class="bi bi-pencil-fill btn-outline-primary btn-sm"> Atualizar</button>
-                        <button v-if="remover" class="bi-trash btn-outline-danger btn-sm"> Remover</button>
+                        <button v-if="remover" class="bi-trash btn-outline-danger btn-sm"
+                                :data-toggle="remover.dataToggle"
+                                :data-target="remover.dataTarget"
+                                @click="setStore(obj)">
+                            Remover
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -41,6 +46,8 @@
         props: ['dados', 'titulos', 'atualizar', 'visualizar', 'remover'],
         methods: {
             setStore(obj) {
+                this.$store.state.transacao.status = ''
+                this.$store.state.transacao.mensagem = ''
                 this.$store.state.item = obj
                 //console.log(obj)
             }
@@ -60,7 +67,7 @@
                     })
                     dadosFiltrados.push(itemFiltrado)
                 })
-                return dadosFiltrados //retornar []
+                return dadosFiltrados
             }
         }
     }
