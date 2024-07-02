@@ -35,7 +35,7 @@
                                 id: { titulo: 'ID', tipo: 'texto' },
                                 nome: { titulo: 'Nome', tipo: 'texto' },
                                 imagem: { titulo: 'Imagem', tipo: 'imagem' },
-                                created_at: { titulo: 'Data criação', tipo: 'data' },
+                                created_at: { titulo: 'Data/Hora criação', tipo: 'data' },
                             }"
                         >
 
@@ -106,7 +106,7 @@
                     <img :src="'storage/'+$store.state.item.imagem" v-if="$store.state.item.imagem">
                 </inputContainer-component>
                 <inputContainer-component titulo="Data Criação">
-                    <input type="text" class="form-control" :value="$store.state.item.created_at" disabled>
+                    <input type="text" class="form-control" :value="$store.state.item.created_at | formataDataHora" disabled>
                 </inputContainer-component>
             </template>
             <template v-slot:bottons>

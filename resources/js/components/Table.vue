@@ -17,7 +17,7 @@
                            {{ valor }}
                         </span>
                         <span v-else-if="titulos[chaveValor].tipo === 'data'">
-                           {{ valor }}
+                           {{ valor | formataDataHora }}
                         </span>
                     </td>
                     <td v-if="visualizar.visivel || atualizar.visivel || remover.visivel">
