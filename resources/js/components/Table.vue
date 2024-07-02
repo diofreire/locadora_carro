@@ -4,7 +4,7 @@
             <thead>
                 <tr >
                     <th v-for="t, key in titulos" :key="key" scope="col">{{ t.titulo }}</th>
-                    <th v-if="visualizar.visivel || atualizar || remover.visivel"></th>
+                    <th v-if="visualizar.visivel || atualizar.visivel || remover.visivel"></th>
                 </tr>
             </thead>
             <tbody>
@@ -20,14 +20,19 @@
                            {{ valor }}
                         </span>
                     </td>
-                    <td v-if="visualizar.visivel || atualizar || remover.visivel">
+                    <td v-if="visualizar.visivel || atualizar.visivel || remover.visivel">
                         <button v-if="visualizar.visivel" class="bi bi-info-square btn-outline-primary btn-sm"
                                 :data-toggle="visualizar.dataToggle"
                                 :data-target="visualizar.dataTarget"
                                 @click="setStore(obj)">
                             Visualizar
                         </button>
-                        <button v-if="atualizar" class="bi bi-pencil-fill btn-outline-primary btn-sm"> Atualizar</button>
+                        <button v-if="atualizar" class="bi bi-pencil-fill btn-outline-primary btn-sm"
+                                :data-toggle="atualizar.dataToggle"
+                                :data-target="atualizar.dataTarget"
+                                @click="setStore(obj)">
+                            Atualizar
+                        </button>
                         <button v-if="remover" class="bi-trash btn-outline-danger btn-sm"
                                 :data-toggle="remover.dataToggle"
                                 :data-target="remover.dataTarget"
@@ -48,6 +53,7 @@
             setStore(obj) {
                 this.$store.state.transacao.status = ''
                 this.$store.state.transacao.mensagem = ''
+                this.$store.state.transacao.erros = ''
                 this.$store.state.item = obj
                 //console.log(obj)
             }

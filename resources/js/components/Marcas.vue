@@ -29,7 +29,7 @@
                         <table-component
                             :dados="marcas.data"
                             :visualizar=" { visivel: true, dataToggle: 'modal', dataTarget: '#modalMarcaVisualizar' }"
-                            :atualizar="true"
+                            :atualizar="{ visivel: true, dataToggle: 'modal', dataTarget: '#modalMarcaAtualizar' }"
                             :remover="{ visivel: true, dataToggle: 'modal', dataTarget: '#modalMarcaRemover' }"
                             :titulos="{
                                 id: { titulo: 'ID', tipo: 'texto' },
@@ -135,7 +135,31 @@
             </template>
         </modal-component>
 
-
+        <!-- Início do Modal de atualização de Marca -->
+        <modal-component id="modalMarcaAtualizar" titulo="Atualizar Marca">
+            <template v-slot:alertas>
+                <alert-component tipo="success" titulo="Transação realizada com sucesso" :detalhes="$store.state.transacao" v-if="$store.state.transacao.status == 'sucesso'"></alert-component>
+                <alert-component tipo="danger" titulo="Erro na transação" :detalhes="$store.state.transacao" v-if="$store.state.transacao.status == 'erro'"></alert-component>
+            </template>
+            <template v-slot:conteudo>
+                <div class="form-group">
+                    <div class="col mb-3">
+                        <inputContainer-component titulo="Nome da Marca" id="atualizarNome" id-help="atualizarNomeHelp" texto-ajuda="Informe o nome da Marca">
+                            <input type="text" class="form-control" id="atualizarNome" aria-describedby="atualizarNomeHelp" placeholder="Nome da Marca" v-model="$store.state.item.nome">
+                        </inputContainer-component>
+                    </div>
+                    <div class="col mb-3">
+                        <inputContainer-component titulo="Imagem" id="atualizarImagem" id-help="atualizarImagemHelp" texto-ajuda="Selecione uma imagem no formato PNG">
+                            <input type="file" class="form-control-file" id="atualizarImagem" aria-describedby="atualizarImagemHelp" placeholder="Selecione uma imagem" @change="carregarImagem($event)">
+                        </inputContainer-component>
+                    </div>
+                </div>
+            </template>
+            <template v-slot:bottons>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" @click="atualizar()">Atualizar</button>
+            </template>
+        </modal-component>
     </div>
 
 </template>
@@ -283,6 +307,44 @@
 
                         this.$store.state.transacao.status = 'erro'
                         this.$store.state.transacao.mensagem = errors.response.data.erros
+                    })
+            },
+            atualizar() {
+                // FormData com Method
+                let formData = new FormData();
+                formData.append('_method', 'patch');
+                formData.append('nome', this.$store.state.item.nome);
+
+                // Verifica se foi definido
+                if(this.arquivoImagem[0]) {
+                    formData.append('imagem', this.arquivoImagem[0]);
+                }
+
+                // URL com ID
+                let url = this.urlBase + '/' + this.$store.state.item.id
+
+                // Configurações
+                let config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                axios.post(url, formData, config)
+                    .then(response => {
+                        this.$store.state.transacao.status = 'sucesso'
+                        this.$store.state.transacao.mensagem = 'Registro atualizado com sucesso'
+
+                        atualizarImagem.value = ''
+                        this.carregarLista()
+                    })
+                    .catch(errors => {
+                        //console.log('Atualizado', errors.response)
+                        this.$store.state.transacao.status = 'erro'
+                        this.$store.state.transacao.mensagem = errors.response.data.message
+                        this.$store.state.transacao.erros = errors.response.data.errors
                     })
             }
         },

@@ -48,7 +48,7 @@ class MarcaController extends Controller
             $marcaRepository->selectRaw($request->where);
         }
 
-        return response()->json($marcaRepository->getResultadoPaginado(3), 200);
+        return response()->json($marcaRepository->getResultadoPaginado(5), 200);
     }
 
     /**
@@ -116,25 +116,21 @@ class MarcaController extends Controller
 
         $request->validate($regras, $this->marca->feedback());
 
-        // Trativa da imagens
-        $imagem = $request->file('imagem');
+        // Preenchendo objeto marca com todos dados do request
+        $marca->fill($request->all());
 
-        // Removendo imagem atualizada
-        if($imagem) {
+        // se a imagem foi encaminhada na request
+        if($request->file('imagem')) {
+            // Remove arquivo antigo
             Storage::disk('public')->delete($marca->imagem);
+
+            $imagem = $request->file('imagem');
+            $marca->imagem = $imagem->store('imagens', 'public');
         }
 
-        //preenche o objeto $marca com os dados do request
-        $marca->fill($request->all());
-        $marca->imagem = $imagem->store('imagens', 'public');
         $marca->save();
 
-        /*$marca->update([
-            'nome' => $request->nome,
-            'imagem' => $imagem->store('imagens', 'public')
-        ]);*/
-
-        return $marca;
+        return response()->json($marca, 200);
     }
 
     /**
