@@ -39,3 +39,48 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/* interceptar os requests da aplicação */
+axios.interceptors.request.use(
+    config => {
+        // Definido para todas requisições
+        config.headers['Accept'] = 'application/json';
+
+
+        // Definiçao do Token
+        let token = document.cookie.split('; ')
+            .find(row => row.includes('token='))
+            .split('=')[1]
+
+        config.headers.Authorization = token;
+        return config
+    },
+    error => {
+        console.log('Erro na requisição', error)
+        return Promise.reject(error)
+    }
+)
+
+/* interceptar os responses da aplicação */
+axios.interceptors.response.use(
+    response => {
+        //console.log('Requisição', response)
+        return response
+    },
+error => {
+        //console.log('Erro na requisição', error)
+        if(error.response.status == 401 && error.response.data.message == 'Token has expired') {
+            // Refresh no token
+            axios.post('http://localhost:8000/api/refresh')
+                .then(response => {
+                    //console.log('Refresh', response)
+                    document.cookie = 'token='+response.data.token+';SameSite=Lax'
+                    //console.log('Token atualizado: ', response.data.token)
+                    window.location.reload() // atualiza navegador
+                })
+                .catch(erros => {
+                })
+        }
+        return Promise.reject(error)
+    }
+)
