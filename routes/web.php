@@ -23,3 +23,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/marcas', function () {
     return view('app.marcas');
 })->name('marcas')->middleware('auth');
+
+Route::resource('noticia', App\Http\Controllers\NoticiaController::class)
+    ->middleware('auth');

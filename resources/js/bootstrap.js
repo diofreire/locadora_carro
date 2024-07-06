@@ -43,20 +43,25 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /* interceptar os requests da aplicação */
 axios.interceptors.request.use(
     config => {
-        // Definido para todas requisições
-        config.headers['Accept'] = 'application/json';
 
+        //deinifir para todas as requisições os parâmetros de accept e autorization
+        config.headers['Accept'] = 'application/json'
 
-        // Definiçao do Token
-        let token = document.cookie.split('; ')
-            .find(row => row.includes('token='))
-            .split('=')[1]
+        //recuperando o token de autorização dos cookies
+        let token = document.cookie.split(';').find(indice => {
+            return indice.includes('token=')
+        })
 
-        config.headers.Authorization = token;
+        token = token.split('=')[1]
+        token = 'Bearer ' + token
+
+        config.headers.Authorization = token
+
+        //console.log('Interceptando o request antes do envio', config)
         return config
     },
     error => {
-        console.log('Erro na requisição', error)
+        //console.log('Erro na requisição: ', error)
         return Promise.reject(error)
     }
 )
@@ -64,21 +69,22 @@ axios.interceptors.request.use(
 /* interceptar os responses da aplicação */
 axios.interceptors.response.use(
     response => {
-        //console.log('Requisição', response)
+        //console.log('Interceptando a resposta antes da aplicação', response)
         return response
     },
-error => {
-        //console.log('Erro na requisição', error)
+    error => {
+        //console.log('Erro na resposta: ', error.response)
+
         if(error.response.status == 401 && error.response.data.message == 'Token has expired') {
-            // Refresh no token
+            //console.log('Fazer uma nova requisição para rota refresh')
+
             axios.post('http://localhost:8000/api/refresh')
                 .then(response => {
-                    //console.log('Refresh', response)
-                    document.cookie = 'token='+response.data.token+';SameSite=Lax'
-                    //console.log('Token atualizado: ', response.data.token)
-                    window.location.reload() // atualiza navegador
-                })
-                .catch(erros => {
+                    console.log('Refresh com sucesso: ', response)
+
+                    document.cookie = 'token='+response.data.token
+                    console.log('Token atualizado: ', response.data.token)
+                    window.location.reload()
                 })
         }
         return Promise.reject(error)

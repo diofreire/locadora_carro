@@ -12,7 +12,8 @@ abstract class AbstractRepository
     }
 
     /**
-     * @param $atributos
+     * SELECIONA APARTIR DOS ATRIBUTOS HAS/HAVE DA MODEL
+     * @param string $atributos
      * @return void
      */
     public function selectWithAtributtes(string $atributos) {

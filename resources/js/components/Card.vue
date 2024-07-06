@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import InputContainer from "./InputContainer.vue";
-
 export default {
     props: [
         'titulo'
