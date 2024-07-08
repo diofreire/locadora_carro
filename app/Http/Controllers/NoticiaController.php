@@ -10,6 +10,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 
 class NoticiaController extends Controller
 {
@@ -30,7 +31,29 @@ class NoticiaController extends Controller
      */
     public function index()
     {
-        return view('noticias', ['noticias' => Noticia::OrderByDesc('created_at')->limit(10)->get()]);
+        // Criar um dado dentro db redis
+        // Chave, valor, tempo em segundos para expirar dado
+        //Cache::put('site', 'admin.com.br', 10);
+
+        // Recuperar um dado do db redis
+        //$site = Cache::get('site');
+        //echo $site;
+
+        $noticias = [];
+
+        // Verifica se há cache
+//        if(Cache::has('dez_primeiras_noticias')) {
+//            $noticias = Cache::get('dez_primeiras_noticias');
+//        } else {
+//            $noticias = Noticia::orderByDesc('created_at')->limit(10)->get();
+//            Cache::put('dez_primeiras_noticias', $noticias, 15);
+//        }
+
+        $noticias = Cache::remember('dez_primeiras_noticias', 15, function() {
+            return Noticia::orderByDesc('created_at')->limit(10)->get();
+        });
+
+        return view('noticias', ['noticias' => $noticias]);
     }
 
     /**
